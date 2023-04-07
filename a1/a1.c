@@ -10,7 +10,6 @@
 #define MAX_FILTER 4096
 #define MAX_LENGTH 4096
 
-
 typedef struct
 {
     char name[10];
@@ -22,7 +21,7 @@ typedef struct
 typedef struct header
 {
     char magic[3];
-    short int eader_size,version;
+    short int eader_size, version;
     char num_sections;
     section_header_t *section_headers;
 } sf_header_t;
@@ -80,6 +79,50 @@ void listDir(int *valid, const char *path, int recursive, int size_limit, char *
     closedir(dir);
 }
 
+int checkTypes(int fd,char num_sections, section_header_t *sh)
+{
+    
+    int check=0;
+    for (int i = 0; i < num_sections; i++)
+    {
+        if (read(fd, &sh[i].name, 9) < 0)
+        {
+            free(sh);
+            close(fd);
+            return 0;
+        }
+        sh[i].name[9] = '\0';
+
+        if (read(fd, &sh[i].type, 1) < 0)
+        {
+            free(sh);
+            close(fd);
+            return -5;
+        }
+        if (read(fd, &sh[i].offset, 4) < 0)
+        {
+            free(sh);
+            close(fd);
+            return 0;
+        }
+        if (read(fd, &sh[i].size, 4) < 0)
+        {
+            free(sh);
+            close(fd);
+            return 0;
+        }
+        if (strnlen(sh[i].name, 9) > 9)
+        {
+            printf("Invalid section name %ld", strnlen(sh[i].name, 9));
+            return 0;
+        }
+        if (sh[i].type != 16 && sh[i].type != 65 && sh[i].type != 46 && sh[i].type != 34 && sh[i].type != 46 && sh[i].type != 44)
+        {
+            check=1;
+        }
+    }
+    return check;
+}
 
 int sectionFile(const char *path)
 {
@@ -87,7 +130,7 @@ int sectionFile(const char *path)
     char magic[3];
     short int version, header_size;
     char num_sections;
-   
+
     fd = open(path, O_RDONLY);
     if (fd == -1)
     {
@@ -127,7 +170,8 @@ int sectionFile(const char *path)
         printf("ERROR\nwrong version");
         return -3;
     }
-    if(read(fd,&num_sections,1)<0){
+    if (read(fd, &num_sections, 1) < 0)
+    {
         close(fd);
         return 0;
     }
@@ -139,63 +183,42 @@ int sectionFile(const char *path)
         return 0;
     }
 
-    printf("SUCCESS\n");
-    printf("version=%d\n", version);
-    printf("nr_sections=%d\n", num_sections);
-
-    section_header_t *section_headers =(section_header_t*)malloc(num_sections * sizeof(section_header_t));
+    section_header_t *section_headers = (section_header_t *)malloc(num_sections * sizeof(section_header_t));
     if (section_headers == NULL)
     {
         close(fd);
         return 0;
     }
 
+    int valid = 1;
+    int check = checkTypes(fd,num_sections,section_headers);
     for (int i = 0; i < num_sections; i++)
     {
-        if (read(fd, &section_headers[i].name, 9) < 0)
+        if (section_headers[i].type != 16 && section_headers[i].type != 65 && section_headers[i].type != 44 && section_headers[i].type != 34 && section_headers[i].type != 46 && section_headers[i].type != 44)
         {
-            free(section_headers);
-            close(fd);
-            return 0;
-        }
-        section_headers[i].name[9] = '\0';
-
-        if (read(fd, &section_headers[i].type, 1) < 0)
-        {
-            free(section_headers);
-            close(fd);
-            return -5;
-        }
-        if (read(fd, &section_headers[i].offset, 4) < 0)
-        {
-            free(section_headers);
-            close(fd);
-            return 0;
-        }
-        if (read(fd, &section_headers[i].size, 4) < 0)
-        {
-            free(section_headers);
-            close(fd);
-            return 0;
-        }
-        if (strnlen(section_headers[i].name, 9) > 9)
-        {
-            printf("Invalid section name %ld", strnlen(section_headers[i].name, 9));
-        }
-        if (section_headers[i].type != 16 && section_headers[i].type !=65 &&  section_headers[i].type !=44 &&  section_headers[i].type !=34 && section_headers[i].type !=46 && section_headers[i].type !=44)
-        {
-            printf("\nERROR\nwrong sect_types");
+            printf("ERROR\nwrong sect_types");
             free(section_headers);
             close(fd);
             return 0;
         }
         
-        printf("section%d: %s %d %d\n", i + 1, section_headers[i].name, section_headers[i].type, section_headers[i].size);
+        if (valid == 1 && check==0)
+        {
+            printf("SUCCESS\n");
+            printf("version=%d\n", version);
+            printf("nr_sections=%d\n", num_sections);
+            valid = 0;
+        }
+
+        if (check == 0)
+        {
+            printf("section%d: %s %d %d\n", i + 1, section_headers[i].name, section_headers[i].type, section_headers[i].size);
+        }
+
     }
 
     free(section_headers);
     return 1;
-
 }
 
 int main(int argc, char **argv)
