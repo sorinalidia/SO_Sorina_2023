@@ -8,6 +8,24 @@
 
 #define MAX_PATH 4096
 #define MAX_FILTER 4096
+#define MAX_LENGTH 4096
+
+
+typedef struct
+{
+    char name[10];
+    char type;
+    int offset;
+    int size;
+} section_header_t;
+
+typedef struct header
+{
+    char magic[3];
+    short int eader_size,version;
+    char num_sections;
+    section_header_t *section_headers;
+} sf_header_t;
 
 void listDir(int *valid, const char *path, int recursive, int size_limit, char *name_pref)
 {
@@ -62,6 +80,124 @@ void listDir(int *valid, const char *path, int recursive, int size_limit, char *
     closedir(dir);
 }
 
+
+int sectionFile(const char *path)
+{
+    int fd = -1;
+    char magic[3];
+    short int version, header_size;
+    char num_sections;
+   
+    fd = open(path, O_RDONLY);
+    if (fd == -1)
+    {
+        printf("Could not open file\n");
+        close(fd);
+        return -1;
+    }
+
+    if (read(fd, magic, 2) < 0)
+    {
+        printf("Could not read magic field");
+        return -1;
+    }
+
+    magic[2] = '\0';
+    if (strcmp(magic, "nQ") != 0)
+    {
+        close(fd);
+        printf("ERROR\nwrong magic");
+        return -1;
+    }
+
+    if (read(fd, &header_size, 2) < 0)
+    {
+        close(fd);
+        return 0;
+    }
+
+    if (read(fd, &version, 2) < 0)
+    {
+        close(fd);
+        return 0;
+    }
+    if (version < 122 || version > 143)
+    {
+        close(fd);
+        printf("ERROR\nwrong version");
+        return -3;
+    }
+    if(read(fd,&num_sections,1)<0){
+        close(fd);
+        return 0;
+    }
+
+    if (num_sections < 6 || num_sections > 18)
+    {
+        close(fd);
+        printf("ERROR\nwrong sect_nr\n");
+        return 0;
+    }
+
+    printf("SUCCESS\n");
+    printf("version=%d\n", version);
+    printf("nr_sections=%d\n", num_sections);
+
+    section_header_t *section_headers =(section_header_t*)malloc(num_sections * sizeof(section_header_t));
+    if (section_headers == NULL)
+    {
+        close(fd);
+        return 0;
+    }
+
+    for (int i = 0; i < num_sections; i++)
+    {
+        if (read(fd, &section_headers[i].name, 9) < 0)
+        {
+            free(section_headers);
+            close(fd);
+            return 0;
+        }
+        section_headers[i].name[9] = '\0';
+
+        if (read(fd, &section_headers[i].type, 1) < 0)
+        {
+            free(section_headers);
+            close(fd);
+            return -5;
+        }
+        if (read(fd, &section_headers[i].offset, 4) < 0)
+        {
+            free(section_headers);
+            close(fd);
+            return 0;
+        }
+        if (read(fd, &section_headers[i].size, 4) < 0)
+        {
+            free(section_headers);
+            close(fd);
+            return 0;
+        }
+        if (strnlen(section_headers[i].name, 9) > 9)
+        {
+            printf("Invalid section name %ld", strnlen(section_headers[i].name, 9));
+        }
+        if (section_headers[i].type != 16 && section_headers[i].type !=65 &&  section_headers[i].type !=44 &&  section_headers[i].type !=34 && section_headers[i].type !=46 && section_headers[i].type !=44)
+        {
+            printf("\nERROR\nwrong sect_types");
+            free(section_headers);
+            close(fd);
+            return 0;
+        }
+        
+        printf("section%d: %s %d %d\n", i + 1, section_headers[i].name, section_headers[i].type, section_headers[i].size);
+    }
+
+    free(section_headers);
+    return 1;
+
+}
+
 int main(int argc, char **argv)
 {
     char path[MAX_PATH] = "";
@@ -106,6 +242,14 @@ int main(int argc, char **argv)
             listDir(valid, path, recursive, size_limit, name_pref);
 
             return 0;
+        }
+        else if (strcmp(argv[1], "parse") == 0)
+        {
+            if (strncmp(argv[2], "path=", 5) == 0)
+            {
+                strcpy(path, argv[2] + 5);
+                sectionFile(path);
+            }
         }
         else
         {
