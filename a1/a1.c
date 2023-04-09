@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <math.h>
 
 #define MAX_PATH 4096
 #define MAX_FILTER 4096
@@ -18,13 +19,13 @@ typedef struct
     int size;
 } section_header_t;
 
-typedef struct header
-{
-    char magic[3];
-    short int eader_size, version;
-    char num_sections;
-    section_header_t *section_headers;
-} sf_header_t;
+// typedef struct header
+// {
+//     char magic[3];
+//     short int eader_size, version;
+//     char num_sections;
+//     section_header_t *section_headers;
+// } sf_header_t;
 
 void listDir(const char *path, int recursive, int size_limit, char *name_pref)
 {
@@ -292,12 +293,11 @@ int isSectionFile(const char *path)
             return -1;
         }
     }
-    if (k < 2 || check==1)
+    if (k < 2 || check == 1)
     {
         free(section_headers);
         return 0;
     }
-
 
     free(section_headers);
     return 1;
@@ -325,7 +325,7 @@ void findAllSF(const char *path, int *valid)
             {
                 if (S_ISREG(file_stat.st_mode))
                 {
-                    if (isSectionFile(fullPath)==1)
+                    if (isSectionFile(fullPath) == 1)
                     {
                         printf("%s\n", fullPath);
                     }
@@ -341,12 +341,154 @@ void findAllSF(const char *path, int *valid)
     closedir(dir);
 }
 
+void extractLine(const char *path, int section, int line)
+{
+    int fd = -1;
+    char magic[3];
+    short int version, header_size;
+    char num_sections;
+
+    fd = open(path, O_RDONLY);
+    if (fd == -1)
+    {
+        close(fd);
+        printf("Could not open file\n");
+
+        return;
+    }
+
+    if (read(fd, magic, 2) < 0)
+    {
+        close(fd);
+        return;
+    }
+
+    magic[2] = '\0';
+    if (strcmp(magic, "nQ") != 0)
+    {
+        close(fd);
+        return;
+    }
+
+    if (read(fd, &header_size, 2) < 0)
+    {
+        close(fd);
+        return;
+    }
+
+    if (read(fd, &version, 2) < 0)
+    {
+        close(fd);
+        return;
+    }
+    if (version < 122 || version > 143)
+    {
+        close(fd);
+        return;
+    }
+    if (read(fd, &num_sections, 1) < 0)
+    {
+        close(fd);
+        return;
+    }
+
+    if (num_sections < 6 || num_sections > 18)
+    {
+        close(fd);
+        return;
+    }
+
+    section_header_t *section_headers = (section_header_t *)malloc(num_sections * sizeof(section_header_t));
+
+    if (section_headers == NULL)
+    {
+        close(fd);
+        return;
+    }
+    int check = checkTypes(fd, num_sections, section_headers);
+    if (check != 0)
+    {
+        printf("ERROR\ninvalid file\n");
+        free(section_headers);
+        close(fd);
+        return;
+    }
+
+    if (section < 1 || section > num_sections)
+    {
+        printf("ERROR\ninvalid section");
+        free(section_headers);
+        close(fd);
+        return;
+    }
+
+    char buffer[2048];
+
+    int offset = section_headers[section - 1].offset;
+    int size = section_headers[section - 1].size;
+
+    int bytes_read = 0;
+    int line_count = 1;
+    while (bytes_read < size)
+    {
+        int bytes_to_read = sizeof(buffer);
+        if (bytes_read + bytes_to_read > size)
+        {
+            bytes_to_read = size - bytes_read;
+        }
+        if (lseek(fd, offset + size - bytes_read - bytes_to_read, SEEK_SET) < 0)
+        {
+            printf("ERROR\n");
+            free(section_headers);
+            close(fd);
+            return;
+        }
+        int bytes = read(fd, buffer, bytes_to_read);
+        if (bytes < 0)
+        {
+            printf("ERROR\n");
+            free(section_headers);
+            close(fd);
+            return;
+        }
+        bytes_read += bytes;
+
+        for (int i = bytes - 1; i >= 0; i--)
+        {
+            if (buffer[i] == '\x0A')
+            {
+                line_count++;
+            }
+            if (line_count - 1 == line)
+            {
+                char *fullLine = strtok(&buffer[i + 1], "\x0A");
+                if (fullLine != NULL)
+                {
+                    printf("SUCCESS\n%s\n", fullLine);
+                    free(section_headers);
+                    close(fd);
+                    return;
+                }
+                else
+                {
+                    printf("ERROR\n");
+                    free(section_headers);
+                    close(fd);
+                    return;
+                }
+            }
+        }
+    }
+}
+
 int main(int argc, char **argv)
 {
     char path[MAX_PATH] = "";
     int recursive = 0;
     int size_limit = 0;
     int *valid = 0;
+    char section = 0;
+    int line = 0;
     char name_pref[MAX_FILTER] = "";
     if (argc >= 2)
     {
@@ -401,6 +543,22 @@ int main(int argc, char **argv)
                 strcpy(path, argv[2] + 5);
                 printf("SUCCESS\n");
                 findAllSF(path, valid);
+            }
+        }
+        else if (strcmp(argv[1], "extract") == 0)
+        {
+            if (strncmp(argv[2], "path=", 5) == 0)
+            {
+                strcpy(path, argv[2] + 5);
+                if (strncmp(argv[3], "section=", 8) == 0)
+                {
+                    section = atoi(argv[3] + 8);
+                    if (strncmp(argv[4], "line=", 5) == 0)
+                    {
+                        line = atoi(argv[4] + 5);
+                        extractLine(path, section, line);
+                    }
+                }
             }
         }
         else
