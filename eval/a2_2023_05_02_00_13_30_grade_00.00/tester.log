@@ -1,0 +1,335 @@
+[1;35mTest 1...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+[1;35mTest 2...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+[1;35mTest 3...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+[1;35mTest 4...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+[1;35mTest 5...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+Total score: 0 / 100
+Assignment grade: 0.00 / 100
+[1;35mTest 1...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+[1;35mTest 2...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+[1;35mTest 3...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+[1;35mTest 4...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+[1;35mTest 5...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+Total score: 0 / 100
+Assignment grade: 0.00 / 100
+[1;35mTest 1...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+[1;35mTest 2...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+[1;35mTest 3...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+[1;35mTest 4...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+[1;35mTest 5...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+Total score: 0 / 100
+Assignment grade: 0.00 / 100
+[1;35mTest 1...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+[1;35mTest 2...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+[1;35mTest 3...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+[1;35mTest 4...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+[1;35mTest 5...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+Total score: 0 / 100
+Assignment grade: 0.00 / 100
+[1;35mTest 1...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+[1;35mTest 2...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+[1;35mTest 3...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+[1;35mTest 4...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+[1;35mTest 5...[0m
+	Checking process hierarchy...
+		missing main thread for processes: 2 3 4 5 6 7 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from the same process...
+		main thread is missing for process 6
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads barrier...
+		main thread is missing for process 8
+		[1;31mFAIL           [0m [0 point(s)]
+	Checking threads from different processes...
+		main thread is missing for process 5
+		[1;31mFAIL           [0m [0 point(s)]
+Total score: 0 / 100
+Assignment grade: 0.00 / 100
