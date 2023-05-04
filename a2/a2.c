@@ -7,7 +7,6 @@
 #include <semaphore.h>
 #include <fcntl.h>
 
-
 #define NR_THREADS8 48
 #define NR_THREADS5 6
 #define NR_THREADS6 5
@@ -16,6 +15,10 @@ sem_t *semaphore2;
 int c=0;
 pthread_cond_t condition1=PTHREAD_COND_INITIALIZER;
 pthread_mutex_t mutex1=PTHREAD_MUTEX_INITIALIZER;
+
+sem_t sem;
+
+
 void* thread_function(void* arg)
 {
     int thread_num = *(int*)arg;
@@ -91,96 +94,25 @@ void* thread_function5(void* arg)
     {
         info(END, 5, thread_num);
         sem_post(semaphore1);
-
-
     }
     else 
     {
         info(END, 5, thread_num);
     }
-     //pthread_mutex_unlock(&mutex1);
     return NULL;
 }
 
-
-// void* thread_function(void* arg)
-// {
-//    // 
-//     int thread_num = *(int*)arg;
-//     pthread_mutex_lock(&mutex1);
-//     //info(BEGIN, 6, thread_num);
-//     if(thread_num==1)
-//     {
-//         info(BEGIN, 6, thread_num);
-//         c=1;
-//         pthread_cond_signal(&condition1);
-
-//     }
-//     else if(thread_num==4)
-//     {
-//         //pthread_cond_wait(&condition1,&mutex1);
-//         if(c==1)
-//         {
-//             info(BEGIN, 6, thread_num);
-    
-//         }
-//          else{
-//             pthread_cond_wait(&condition1,&mutex1);
-//             info(BEGIN, 6, thread_num);}
-
-//     }
-//     else if(thread_num==3)
-//     {
-//         sem_wait(semaphore1);
-//         info(BEGIN,6,thread_num);
-//     }
-//     else  info(BEGIN, 6, thread_num);
-
-//     if(thread_num==1){
-//         pthread_cond_wait(&condition1,&mutex1);
-//         info(END,6,thread_num);
-//     }
-//     else if(thread_num==4){
-//         info(END,6,thread_num);
-//         pthread_cond_signal(&condition1);
-        
-//     }else if(thread_num==3)
-//     {
-//         info(END,6,thread_num);
-//         sem_post(semaphore2);
-//     }
-//     else info(END,6,thread_num);
-
-// pthread_mutex_unlock(&mutex1);
-//     return NULL;
-// }
 void* thread_function8(void* arg)
 {
     int thread_num = *(int*)arg;
+    sem_wait(&sem);
     info(BEGIN, 8, thread_num);
-
+ 
     info(END, 8, thread_num);
+    sem_post(&sem);
+
     return NULL;
 }
-// void* thread_function5(void* arg)
-// {
-//     int thread_num = *(int*)arg;
-//     if(thread_num==2)
-//     {
-//           sem_wait(semaphore2);
-//           info(BEGIN, 5, thread_num);
-        
-//     }else
-//     info(BEGIN, 5, thread_num);
-//     if(thread_num==3)
-//     {
-//     info(END, 5, thread_num);
-//     sem_post(semaphore1);
-//     }
-//     else info(END, 5, thread_num);
-   
-//     return NULL;
-// }
 
 int main() {
     init();
@@ -190,7 +122,7 @@ int main() {
     pthread_cond_init(&condition1,NULL);
     pthread_mutex_init(&mutex1,NULL);
     pid_t pid2, pid3, pid4, pid5, pid6, pid7, pid8;
-   
+ 
     pid2 = fork();
     if (pid2 == 0) { // p2
         info(BEGIN,2,0);
@@ -240,6 +172,7 @@ int main() {
                     pid8 = fork();
                     if (pid8 == 0) { // p8
                         info(BEGIN,8,0);
+                        sem_init(&sem,0,4);
                         pthread_t threads[NR_THREADS8];
                     int thread_nums[NR_THREADS8];
                     for (int i = 0; i < NR_THREADS8; i++) {
@@ -272,10 +205,12 @@ int main() {
         return 0;
     }
     waitpid(pid2, NULL, 0);
-     sem_close(semaphore1);
+    sem_close(semaphore1);
     sem_unlink("/sem1");
-     sem_close(semaphore2);
+    sem_close(semaphore2);
     sem_unlink("/sem2");
     info(END,1,0);
+    sem_destroy(&sem);
+
     return 0;
 }
