@@ -4,20 +4,61 @@
 #include <sys/wait.h>
 #include <pthread.h>
 #include "a2_helper.h"
+#include <semaphore.h>
 
 #define NR_THREADS8 48
 #define NR_THREADS5 6
 #define NR_THREADS6 5
 
+int c=0;
+pthread_cond_t condition1=PTHREAD_COND_INITIALIZER;
+pthread_mutex_t mutex1=PTHREAD_MUTEX_INITIALIZER;
+
+
 void* thread_function(void* arg)
 {
+   // 
     int thread_num = *(int*)arg;
-  
-    info(BEGIN, 6, thread_num);
-    if(thread_num==4)
+    pthread_mutex_lock(&mutex1);
+    //info(BEGIN, 6, thread_num);
+    if(thread_num==1)
     {
-    info(END, 6, thread_num);
+        info(BEGIN, 6, thread_num);
+        c=1;
+        pthread_cond_signal(&condition1);
+
     }
+    else if(thread_num==4)
+    {
+        //pthread_cond_wait(&condition1,&mutex1);
+        if(c==1)
+        {
+            info(BEGIN, 6, thread_num);
+    
+        }
+         else{
+            pthread_cond_wait(&condition1,&mutex1);
+            info(BEGIN, 6, thread_num);}
+
+       
+          
+
+
+    }
+    else  info(BEGIN, 6, thread_num);
+
+    if(thread_num==1){
+        pthread_cond_wait(&condition1,&mutex1);
+        info(END,6,thread_num);
+    }
+    else if(thread_num==4){
+        info(END,6,thread_num);
+        pthread_cond_signal(&condition1);
+        
+    }
+    else info(END,6,thread_num);
+
+pthread_mutex_unlock(&mutex1);
     return NULL;
 }
 void* thread_function8(void* arg)
@@ -40,6 +81,8 @@ void* thread_function5(void* arg)
 int main() {
     init();
     info(BEGIN,1,0);
+    pthread_cond_init(&condition1,NULL);
+    pthread_mutex_init(&mutex1,NULL);
     pid_t pid2, pid3, pid4, pid5, pid6, pid7, pid8;
    
     pid2 = fork();
