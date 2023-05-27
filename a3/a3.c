@@ -60,7 +60,7 @@ int main() {
 
     char request[251];
     ssize_t bytesRead;
-/*  char* pointerMemoriePartajta = NULL;
+ /* char* pointerMemoriePartajta = NULL;
  char* pointerFisier = NULL;
  off_t sizeFile = 0; */
     while (1) {
@@ -79,13 +79,14 @@ int main() {
         {
             /* munmap(pointerMemoriePartajta,sizeof(char)*2638041);
             munmap(pointerFisier,sizeof(char)*sizeFile);
-            pointerMemoriePartajta = NULL;
-            shm_unlink("/tLMIZD0"); */
+            pointerMemoriePartajta = NULL; */
+            shm_unlink("/tLMIZD0");
             close(reqPipe);
             close(respPipe);
             unlink(REQ_PIPE_NAME);
             break;
-        }else if (strcmp(request, "PING!") == 0) {
+        }
+        else if (strcmp(request, "PING!") == 0) {
             // Handle Ping Request
             const char* response1 = "PING";
             const char* response2 = "PONG";
@@ -102,10 +103,68 @@ int main() {
 
             write(respPipe, &number, sizeof(number));
 
-           // writeStringField(respPipe, response1);
-            //writeStringField(respPipe, response2);
-            //writeNumberField(respPipe, response3);
+        
         }
+        else if (strstr(request, "CREATE_SHM! 2638041") == 0) {
+           /*  int nrOcteti=0;
+            read(reqPipe,&nrOcteti,4); */
+            // Handle Shared Memory Creation Request
+            const char* shmName = "/tLMIZD0";
+            unsigned int shmSize = 2638041;
+            mode_t shmPermission = 0664;
+            int shmFd;
+            void* shmPtr;
+
+            shmFd = shm_open(shmName, O_CREAT | O_EXCL | O_RDWR, shmPermission);
+            if (shmFd != -1) {
+                if (ftruncate(shmFd, shmSize) != -1) {
+                    shmPtr = mmap(NULL, shmSize, PROT_READ | PROT_WRITE, MAP_SHARED, shmFd, 0);
+                    if (shmPtr != (void*)-1) {
+                        // Successfully created and attached shared memory region
+                        const char* successResponse = "SUCCESS";
+                        const char* response="CREATE_SHM";
+                        int length;
+                        length = strlen(response);
+                        write(respPipe, response, length);
+                        write(respPipe, "!", 1);
+
+                        length = strlen(successResponse);
+                        write(respPipe, successResponse, length);
+                        write(respPipe, "!", 1);
+                    } else {
+                        // Failed to attach shared memory region
+                        const char* errorResponse = "ERROR";
+                        const char* response="CREATE_SHM";
+                        int length;
+                        length = strlen(response);
+                        write(respPipe, response, length);
+                        write(respPipe, "!", 1);
+
+                        length = strlen(errorResponse);
+                        write(respPipe, errorResponse, length);
+                        write(respPipe, "!", 1);
+                    }
+                } else {
+                    // Failed to adjust shared memory size
+                       const char* errorResponse = "ERROR";
+                        const char* response="CREATE_SHM";
+                        int length;
+                        length = strlen(response);
+                        write(respPipe, response, length);
+                        write(respPipe, "!", 1);
+
+                        length = strlen(errorResponse);
+                        write(respPipe, errorResponse, length);
+                        write(respPipe, "!", 1);
+                }
+                close(shmFd);
+            } else {
+                // Failed to create shared memory region
+                const char* errorResponse = "CREATE_SHM ERROR";
+                writeStringField(respPipe, errorResponse);
+            }
+        }
+    
         else{
             break;
         }
@@ -113,12 +172,12 @@ int main() {
 
     // Close the request pipe
     close(reqPipe);
-  /*   close(respPipe);
+    close(respPipe);
     // Remove the response pipe
     if (unlink(RESP_PIPE_NAME) == -1) {
         perror("ERROR: Cannot remove the response pipe");
         return 1;
-    } */
+    } 
 
     return 0;
 }
