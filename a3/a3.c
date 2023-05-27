@@ -63,6 +63,9 @@ int main() {
  /* char* pointerMemoriePartajta = NULL;
  char* pointerFisier = NULL;
  off_t sizeFile = 0; */
+    int shmFd;
+    char* shmPtr=NULL;
+    //char *string=NULL;
     while (1) {
         bytesRead = read(reqPipe, request, sizeof(request)) ;
         request[bytesRead] = '\0';
@@ -77,9 +80,9 @@ int main() {
 
           if(strcmp(request,"EXIT!") == 0)
         {
-            /* munmap(pointerMemoriePartajta,sizeof(char)*2638041);
-            munmap(pointerFisier,sizeof(char)*sizeFile);
-            pointerMemoriePartajta = NULL; */
+            munmap(shmPtr,sizeof(char)*2638041);
+            //munmap(pointerFisier,sizeof(char)*sizeFile);
+            shmPtr = NULL; 
             shm_unlink("/tLMIZD0");
             close(reqPipe);
             close(respPipe);
@@ -105,20 +108,20 @@ int main() {
 
         
         }
-        else if (strstr(request, "CREATE_SHM! 2638041") == 0) {
+        else if (strstr(request, "CREATE_SHM!") != 0) {
            /*  int nrOcteti=0;
             read(reqPipe,&nrOcteti,4); */
+            
             // Handle Shared Memory Creation Request
             const char* shmName = "/tLMIZD0";
             unsigned int shmSize = 2638041;
             mode_t shmPermission = 0664;
-            int shmFd;
-            void* shmPtr;
+    
 
             shmFd = shm_open(shmName, O_CREAT | O_EXCL | O_RDWR, shmPermission);
             if (shmFd != -1) {
                 if (ftruncate(shmFd, shmSize) != -1) {
-                    shmPtr = mmap(NULL, shmSize, PROT_READ | PROT_WRITE, MAP_SHARED, shmFd, 0);
+                    shmPtr = (char*)mmap(NULL, shmSize, PROT_READ | PROT_WRITE, MAP_SHARED, shmFd, 0);
                     if (shmPtr != (void*)-1) {
                         // Successfully created and attached shared memory region
                         const char* successResponse = "SUCCESS";
