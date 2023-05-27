@@ -1,0 +1,3 @@
+/usr/lib/gcc/x86_64-alpine-linux-musl/10.3.1/../../../../x86_64-alpine-linux-musl/bin/ld: /usr/lib/gcc/x86_64-alpine-linux-musl/10.3.1/../../../../lib/Scrt1.o: in function `_start_c':
+/home/buildozer/aports/main/musl/src/v1.2.2/crt/crt1.c:18: undefined reference to `main'
+collect2: error: ld returned 1 exit status
