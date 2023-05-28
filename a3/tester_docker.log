@@ -88,9 +88,15 @@ Test score: 10 / 10
 [TESTER] sending number 0
 [TESTER] sending number 100
 [TESTER] received string 'READ_FROM_FILE_SECTION'
-[TESTER] received string 'SUCCESS'
+[TESTER] received string 'ERROR'
+[TESTER] sending string 'READ_FROM_FILE_SECTION'
+[TESTER] sending number 6
+[TESTER] sending number 1309
+[TESTER] sending number 1078
+[TESTER] received string 'READ_FROM_FILE_SECTION'
+[TESTER] received string 'ERROR'
 [TESTER] sending string 'EXIT'
-Test score: 2 / 10
+Test score: 4 / 10
 [1;35mTesting read_logical...[0m
 [TESTER] received string 'START'
 [TESTER] sending string 'CREATE_SHM'
@@ -102,10 +108,16 @@ Test score: 2 / 10
 [TESTER] received string 'MAP_FILE'
 [TESTER] received string 'SUCCESS'
 [TESTER] sending string 'READ_FROM_LOGICAL_SPACE_OFFSET'
-[TESTER] sending number 496
-[TESTER] sending number 366
-	[1;31mTIME LIMIT EXCEEDED[0m
-Test score: 0 / 10
+[TESTER] sending number 40200
+[TESTER] sending number 1660
+[TESTER] received string 'READ_FROM_LOGICAL_SPACE_OFFSET'
+[TESTER] received string 'SUCCESS'
+[TESTER] read content incorrect
+[TESTER] sending string 'READ_FROM_LOGICAL_SPACE_OFFSET'
+[TESTER] sending number 58849
+[TESTER] sending number 796
+[TESTER] sending string 'EXIT'
+Test score: 2 / 10
 
-Total score: 45 / 70
-Assignment grade: 64.29 / 100
+Total score: 49 / 70
+Assignment grade: 70.00 / 100
