@@ -58,28 +58,42 @@ int main() {
     }
     printf("SUCCESS\n");
 
-    char request[251];
-    ssize_t bytesRead;
- /* char* pointerMemoriePartajta = NULL;
- char* pointerFisier = NULL;
- off_t sizeFile = 0; */
     int shmFd;
     char* shmPtr=NULL;
-    //char *string=NULL;
-    while (1) {
-        bytesRead = read(reqPipe, request, sizeof(request)) ;
-        request[bytesRead] = '\0';
-     /*    if (bytesRead<0)
-        {
-            close(reqPipe);
-            close(respPipe);
-            unlink(RESP_PIPE_NAME);
 
+    /* char request[251];
+    ssize_t bytesRead;
+    bytesRead = read(reqPipe, request, sizeof(request)) ;
+    request[bytesRead] = '\0';
+ */
+    char request[251];
+    ssize_t bytesRead;
+    ssize_t totalBytesRead = 0;
+
+    while (totalBytesRead < sizeof(request) - 1) {
+        bytesRead = read(reqPipe, request + totalBytesRead, 1);
+        if (bytesRead == -1) {
+            // Error occurred while reading
             break;
-        } */
+        } else if (bytesRead == 0) {
+            // Reached end of input
+            break;
+        }
 
-          if(strcmp(request,"EXIT!") == 0)
-        {
+        totalBytesRead += bytesRead;
+
+        if (request[totalBytesRead - 1] == '!') {
+            // Found the terminator "!"
+            break;
+        }
+    }
+
+    request[totalBytesRead] = '\0';
+
+
+  
+    if(strcmp(request,"EXIT!") == 0)
+    {
             munmap(shmPtr,sizeof(char)*2638041);
             //munmap(pointerFisier,sizeof(char)*sizeFile);
             shmPtr = NULL; 
@@ -87,9 +101,9 @@ int main() {
             close(reqPipe);
             close(respPipe);
             unlink(REQ_PIPE_NAME);
-            break;
+            //break;
         }
-        else if (strcmp(request, "PING!") == 0) {
+        else if (strncmp(request, "PING!",6) == 0) {
             // Handle Ping Request
             const char* response1 = "PING";
             const char* response2 = "PONG";
@@ -108,13 +122,14 @@ int main() {
 
         
         }
-        else if (strstr(request, "CREATE_SHM!") != 0) {
-           /*  int nrOcteti=0;
-            read(reqPipe,&nrOcteti,4); */
+        else if (strncmp(request, "CREATE_SHM!",12) == 0) {
+            unsigned int shmSize=0;
+            read(reqPipe,&shmSize,4);
             
             // Handle Shared Memory Creation Request
+
             const char* shmName = "/tLMIZD0";
-            unsigned int shmSize = 2638041;
+            //unsigned int shmSize = 2638041;
             mode_t shmPermission = 0664;
     
 
@@ -160,18 +175,52 @@ int main() {
                         write(respPipe, errorResponse, length);
                         write(respPipe, "!", 1);
                 }
-                close(shmFd);
+                //close(shmFd);
             } else {
                 // Failed to create shared memory region
                 const char* errorResponse = "CREATE_SHM ERROR";
                 writeStringField(respPipe, errorResponse);
             }
         }
-    
-        else{
-            break;
-        }
-    }
+        else if (strcmp(request, "WRITE_TO_SHM!") == 0) {
+            // Handle Write to Shared Memory Request
+            unsigned int offset=0, value=0;
+            read(reqPipe,&offset,4);
+            read(reqPipe,&value,4);
+            unsigned int shmSize = 2638041;
+                    if (offset >= 0 && offset<shmSize && offset + sizeof(unsigned int) <= shmSize) {
+                            //unsigned int* shmData = (unsigned int*)((char*)shmPtr + offset);
+                            //*shmData = value;
+
+                            memcpy(&shmPtr[offset],(void*)&value,4);
+
+                            // Successfully wrote to shared memory
+
+                            const char* successResponse = "SUCCESS";
+                            const char* response="WRITE_TO_SHM";
+                            int length;
+                            length = strlen(response);
+                            write(respPipe, response, length);
+                            write(respPipe, "!", 1);
+
+                            length = strlen(successResponse);
+                            write(respPipe, successResponse, length);
+                            write(respPipe, "!", 1);
+                        } else {
+                            // Invalid offset or out of bounds
+                            const char* errorResponse = "ERROR";
+                            const char* response="WRITE_TO_SHM";
+                            int length;
+                            length = strlen(response);
+                            write(respPipe, response, length);
+                            write(respPipe, "!", 1);
+
+                            length = strlen(errorResponse);
+                            write(respPipe, errorResponse, length);
+                            write(respPipe, "!", 1);
+                       }
+            }
+            close(shmFd);
 
     // Close the request pipe
     close(reqPipe);
