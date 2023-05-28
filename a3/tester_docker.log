@@ -31,6 +31,8 @@ Test score: 10 / 10
 [TESTER] sending string 'WRITE_TO_SHM'
 [TESTER] sending number 14956
 [TESTER] sending number 13746040
+[TESTER] received string 'WRITE_TO_SHM'
+[TESTER] received string 'ERROR'
 [TESTER] sending string 'EXIT'
 Test score: 3 / 10
 [1;35mTesting map_inexistent...[0m
@@ -57,8 +59,20 @@ Test score: 5 / 5
 [TESTER] received string 'SUCCESS'
 [TESTER] sending string 'MAP_FILE'
 [TESTER] sending string 'test_root/54sM7LhVpQ.ruO'
+[TESTER] received string 'MAP_FILE'
+[TESTER] received string 'SUCCESS'
+[TESTER] sending string 'READ_FROM_FILE_OFFSET'
+[TESTER] sending number 53401
+[TESTER] sending number 50
+[TESTER] received string 'READ_FROM_FILE_OFFSET'
+[TESTER] received string 'ERROR'
+[TESTER] sending string 'READ_FROM_FILE_OFFSET'
+[TESTER] sending number 26700
+[TESTER] sending number 50
+[TESTER] received string 'READ_FROM_FILE_OFFSET'
+[TESTER] received string 'SUCCESS'
 [TESTER] sending string 'EXIT'
-Test score: 2 / 10
+Test score: 10 / 10
 [1;35mTesting read_section...[0m
 [TESTER] received string 'START'
 [TESTER] sending string 'CREATE_SHM'
@@ -67,8 +81,16 @@ Test score: 2 / 10
 [TESTER] received string 'SUCCESS'
 [TESTER] sending string 'MAP_FILE'
 [TESTER] sending string 'test_root/BNWGAopi9V.Fje'
+[TESTER] received string 'MAP_FILE'
+[TESTER] received string 'SUCCESS'
+[TESTER] sending string 'READ_FROM_FILE_SECTION'
+[TESTER] sending number 8
+[TESTER] sending number 0
+[TESTER] sending number 100
+[TESTER] received string 'READ_FROM_FILE_SECTION'
+[TESTER] received string 'SUCCESS'
 [TESTER] sending string 'EXIT'
-Test score: 1 / 10
+Test score: 2 / 10
 [1;35mTesting read_logical...[0m
 [TESTER] received string 'START'
 [TESTER] sending string 'CREATE_SHM'
@@ -77,8 +99,13 @@ Test score: 1 / 10
 [TESTER] received string 'SUCCESS'
 [TESTER] sending string 'MAP_FILE'
 [TESTER] sending string 'test_root/qZU9oG8f7q.zHJ'
-[TESTER] sending string 'EXIT'
-Test score: 1 / 10
+[TESTER] received string 'MAP_FILE'
+[TESTER] received string 'SUCCESS'
+[TESTER] sending string 'READ_FROM_LOGICAL_SPACE_OFFSET'
+[TESTER] sending number 496
+[TESTER] sending number 366
+	[1;31mTIME LIMIT EXCEEDED[0m
+Test score: 0 / 10
 
-Total score: 37 / 70
-Assignment grade: 52.86 / 100
+Total score: 45 / 70
+Assignment grade: 64.29 / 100

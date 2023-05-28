@@ -62,6 +62,7 @@ int main() {
     char* shmPtr=NULL;
     char* filePtr=NULL;
     off_t fileSize=0;
+    int fd=-1;
 
     /* char request[251];
     ssize_t bytesRead;
@@ -104,7 +105,7 @@ int main() {
             shm_unlink("/tLMIZD0");
             close(reqPipe);
             close(respPipe);
-            close(shmFd);
+            //close(shmFd);
           
         
             unlink(REQ_PIPE_NAME);
@@ -148,44 +149,29 @@ int main() {
                         // Successfully created and attached shared memory region
                         const char* successResponse = "SUCCESS";
                         const char* response="CREATE_SHM";
-                        int length;
-                        length = strlen(response);
-                        write(respPipe, response, length);
-                        write(respPipe, "!", 1);
-
-                        length = strlen(successResponse);
-                        write(respPipe, successResponse, length);
-                        write(respPipe, "!", 1);
+                    
+                        writeStringField(respPipe,response);
+                        writeStringField(respPipe,successResponse);
                     } else {
                         // Failed to attach shared memory region
                         const char* errorResponse = "ERROR";
                         const char* response="CREATE_SHM";
-                        int length;
-                        length = strlen(response);
-                        write(respPipe, response, length);
-                        write(respPipe, "!", 1);
-
-                        length = strlen(errorResponse);
-                        write(respPipe, errorResponse, length);
-                        write(respPipe, "!", 1);
+                
+                        writeStringField(respPipe,response);
+                        writeStringField(respPipe,errorResponse);
                     }
                 } else {
                     // Failed to adjust shared memory size
-                       const char* errorResponse = "ERROR";
+                        const char* errorResponse = "ERROR";
                         const char* response="CREATE_SHM";
-                        int length;
-                        length = strlen(response);
-                        write(respPipe, response, length);
-                        write(respPipe, "!", 1);
-
-                        length = strlen(errorResponse);
-                        write(respPipe, errorResponse, length);
-                        write(respPipe, "!", 1);
+                        writeStringField(respPipe,response);
+                        writeStringField(respPipe,errorResponse);
                 }
-                //close(shmFd);
             } else {
                 // Failed to create shared memory region
-                const char* errorResponse = "CREATE_SHM ERROR";
+                const char* errorResponse = "ERROR";
+                const char* response="CREATE_SHM";
+                writeStringField(respPipe,response);
                 writeStringField(respPipe, errorResponse);
             }
         }
@@ -196,34 +182,20 @@ int main() {
             read(reqPipe,&value,sizeof(unsigned int));
             //unsigned int shmSize = 2638041;
                     if (offset >= 0 && offset<shmSize && offset + sizeof(unsigned int) <= shmSize) {
-                    
-
                             memcpy(&shmPtr[offset],(void*)&value,4);
 
                             // Successfully wrote to shared memory
 
                             const char* successResponse = "SUCCESS";
                             const char* response="WRITE_TO_SHM";
-                            int length;
-                            length = strlen(response);
-                            write(respPipe, response, length);
-                            write(respPipe, "!", 1);
-
-                            length = strlen(successResponse);
-                            write(respPipe, successResponse, length);
-                            write(respPipe, "!", 1);
+                            writeStringField(respPipe,response);
+                            writeStringField(respPipe,successResponse);
                         } else {
                             // Invalid offset or out of bounds
                             const char* errorResponse = "ERROR";
                             const char* response="WRITE_TO_SHM";
-                            int length;
-                            length = strlen(response);
-                            write(respPipe, response, length);
-                            write(respPipe, "!", 1);
-
-                            length = strlen(errorResponse);
-                            write(respPipe, errorResponse, length);
-                            write(respPipe, "!", 1);
+                            writeStringField(respPipe,response);
+                            writeStringField(respPipe,errorResponse);
                        }
             }
 
@@ -234,7 +206,7 @@ int main() {
         bytesRead = read(reqPipe, fileName, sizeof(fileName)) ;
         fileName[bytesRead-1] = '\0';
 
-        int fd = open(fileName, O_RDONLY);
+        fd = open(fileName, O_RDONLY);
         if (fd != -1) {
             struct stat fileStat;
             if (fstat(fd, &fileStat) != -1) {
@@ -244,18 +216,154 @@ int main() {
                     // Successfully mapped file in memory
                     const char* successResponse = "SUCCESS";
                     const char* response = "MAP_FILE";
-                    int length;
-                    length = strlen(response);
-                    write(respPipe, response, length);
-                    write(respPipe, "!", 1);
-
-                    length = strlen(successResponse);
-                    write(respPipe, successResponse, length);
-                    write(respPipe, "!", 1);
+                    writeStringField(respPipe,response);
+                    writeStringField(respPipe,successResponse);
                 } else {
                     // Failed to map file in memory
                     const char* errorResponse = "ERROR";
                     const char* response = "MAP_FILE";
+                    writeStringField(respPipe,response);
+                    writeStringField(respPipe,errorResponse);
+                }
+            } else {
+                // Failed to get file information
+                const char* errorResponse = "ERROR";
+                const char* response = "MAP_FILE";
+                writeStringField(respPipe,response);
+                writeStringField(respPipe,errorResponse);
+            
+            }
+        } else {
+            // Failed to open the file
+            const char* errorResponse = "ERROR";
+            const char* response = "MAP_FILE";
+            writeStringField(respPipe,response);
+            writeStringField(respPipe,errorResponse);
+        }
+    }
+     if (strncmp(request, "READ_FROM_FILE_OFFSET!", 22) == 0) {
+        // Handle Read From File Offset Request
+        unsigned int offset=0,nrBytes=0;
+        read(reqPipe,&offset,4);
+        read(reqPipe,&nrBytes,4);
+
+            if (shmPtr != (void*)-1) {
+                // Shared memory region exists
+                struct stat fileStat;
+                if (fstat(fd, &fileStat) != -1) {
+                    fileSize = fileStat.st_size;
+                    if (offset + nrBytes <= fileSize) {
+                        // Read from memory-mapped file
+                         char* reader=(char*)malloc((nrBytes+1)*sizeof(char));
+                        memcpy(reader,(filePtr+offset),nrBytes);
+
+                        memcpy(shmPtr, reader, nrBytes);
+
+                        // Successfully read from file offset
+                        const char* successResponse = "SUCCESS";
+                        const char* response = "READ_FROM_FILE_OFFSET";
+                        writeStringField(respPipe,response);
+                        writeStringField(respPipe,successResponse);
+                    } else {
+                        // Invalid offset or out of bounds
+                        const char* errorResponse = "ERROR";
+                        const char* response = "READ_FROM_FILE_OFFSET";
+                        writeStringField(respPipe,response);
+                        writeStringField(respPipe,errorResponse);
+                    }
+                } else {
+                    // Failed to get file information
+                    const char* errorResponse = "ERROR";
+                    const char* response = "READ_FROM_FILE_OFFSET";
+                    writeStringField(respPipe,response);
+                    writeStringField(respPipe,errorResponse);
+                }
+            } else {
+                // Shared memory region does not exist
+                const char* errorResponse = "ERROR";
+                const char* response = "READ_FROM_FILE_OFFSET";
+                writeStringField(respPipe,response);
+                writeStringField(respPipe,errorResponse);
+            
+        }
+    }
+    if (strncmp(request, "READ_FROM_FILE_SECTION!", 23) == 0) {
+        // Handle Read From File Section Request
+        unsigned int sectionNo;
+        unsigned int offset;
+        unsigned int numBytes;
+
+        // Read section number, offset, and number of bytes
+        read(reqPipe, &sectionNo, sizeof(sectionNo));
+        read(reqPipe, &offset, sizeof(offset));
+        read(reqPipe, &numBytes, sizeof(numBytes));
+
+        // Check if shared memory region exists
+        if (shmFd != -1) {
+            // Get the file size
+            struct stat st;
+            if (fstat(fd, &st) == 0) {
+                off_t fileSize = st.st_size;
+                // Calculate section size
+                off_t sectionSize = fileSize / sectionNo;
+                // Calculate section offset
+                off_t sectionOffset = (sectionNo - 1) * sectionSize;
+                // Calculate absolute offset within section
+                off_t absoluteOffset = sectionOffset + offset;
+                if (absoluteOffset + numBytes <= fileSize) {
+                    // Map the file into memory
+                   // void* filePtr = mmap(NULL, fileSize, PROT_READ, MAP_SHARED, fd, 0);
+                    if (filePtr != (void*)-1) {
+                        // Get the shared memory region pointer
+                       // void* shmPtr = mmap(NULL, fileSize, PROT_WRITE, MAP_SHARED, shmFd, 0);
+                        if (shmPtr != MAP_FAILED) {
+                            // Read from memory-mapped file section
+                            memcpy(shmPtr, filePtr + absoluteOffset, numBytes);
+
+                            // Successfully read from file section
+                            const char* successResponse = "SUCCESS";
+                            const char* response = "READ_FROM_FILE_SECTION";
+                            int length;
+                            length = strlen(response);
+                            write(respPipe, response, length);
+                            write(respPipe, "!", 1);
+
+                            length = strlen(successResponse);
+                            write(respPipe, successResponse, length);
+                            write(respPipe, "!", 1);
+                        } else {
+                            // Failed to map shared memory region
+                            const char* errorResponse = "ERROR";
+                            const char* response = "READ_FROM_FILE_SECTION";
+                            int length;
+                            length = strlen(response);
+                            write(respPipe, response, length);
+                            write(respPipe, "!", 1);
+
+                            length = strlen(errorResponse);
+                            write(respPipe, errorResponse, length);
+                            write(respPipe, "!", 1);
+                        }
+
+                        // Unmap the shared memory region
+                        munmap(shmPtr, fileSize);
+                    } else {
+                        // Failed to map the file into memory
+                        const char* errorResponse = "ERROR";
+                        const char* response = "READ_FROM_FILE_SECTION";
+                        int length;
+                        length = strlen(response);
+                        write(respPipe, response, length);
+                        write(respPipe, "!", 1);
+
+                        length = strlen(errorResponse);
+                        write(respPipe, errorResponse, length);
+                        write(respPipe, "!", 1);
+                    }
+                } else {
+                    // Invalid offset or out of bounds
+                    const char* errorResponse = "ERROR";
+                    const char* response = "READ_FROM_FILE_SECTION";
                     int length;
                     length = strlen(response);
                     write(respPipe, response, length);
@@ -268,7 +376,7 @@ int main() {
             } else {
                 // Failed to get file information
                 const char* errorResponse = "ERROR";
-                const char* response = "MAP_FILE";
+                const char* response = "READ_FROM_FILE_SECTION";
                 int length;
                 length = strlen(response);
                 write(respPipe, response, length);
@@ -278,12 +386,10 @@ int main() {
                 write(respPipe, errorResponse, length);
                 write(respPipe, "!", 1);
             }
-
-            close(fd);
         } else {
-            // Failed to open the file
+            // Shared memory region does not exist
             const char* errorResponse = "ERROR";
-            const char* response = "MAP_FILE";
+            const char* response = "READ_FROM_FILE_SECTION";
             int length;
             length = strlen(response);
             write(respPipe, response, length);
@@ -293,12 +399,11 @@ int main() {
             write(respPipe, errorResponse, length);
             write(respPipe, "!", 1);
         }
-    }else {
-        break;
     }
+    
     }
 
-            close(shmFd);
+    close(shmFd);
 
     // Close the request pipe
     close(reqPipe);
