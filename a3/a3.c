@@ -58,14 +58,18 @@ int main() {
     }
     printf("SUCCESS\n");
 
-    int shmFd;
+    int shmFd=-1;
     char* shmPtr=NULL;
+    char* filePtr=NULL;
+    off_t fileSize=0;
 
     /* char request[251];
     ssize_t bytesRead;
     bytesRead = read(reqPipe, request, sizeof(request)) ;
     request[bytesRead] = '\0';
  */
+    while(1){
+
     char request[251];
     ssize_t bytesRead;
     ssize_t totalBytesRead = 0;
@@ -90,20 +94,23 @@ int main() {
 
     request[totalBytesRead] = '\0';
 
-
+    unsigned int shmSize=0;
   
-    if(strcmp(request,"EXIT!") == 0)
+    if(strncmp(request,"EXIT!",5) == 0)
     {
             munmap(shmPtr,sizeof(char)*2638041);
-            //munmap(pointerFisier,sizeof(char)*sizeFile);
+            munmap(filePtr,sizeof(char)*fileSize);
             shmPtr = NULL; 
             shm_unlink("/tLMIZD0");
             close(reqPipe);
             close(respPipe);
+            close(shmFd);
+          
+        
             unlink(REQ_PIPE_NAME);
-            //break;
+            break;
         }
-        else if (strncmp(request, "PING!",6) == 0) {
+        if (strncmp(request, "PING!",6) == 0) {
             // Handle Ping Request
             const char* response1 = "PING";
             const char* response2 = "PONG";
@@ -122,8 +129,8 @@ int main() {
 
         
         }
-        else if (strncmp(request, "CREATE_SHM!",12) == 0) {
-            unsigned int shmSize=0;
+        if (strncmp(request, "CREATE_SHM!",12) == 0) {
+            
             read(reqPipe,&shmSize,4);
             
             // Handle Shared Memory Creation Request
@@ -182,15 +189,14 @@ int main() {
                 writeStringField(respPipe, errorResponse);
             }
         }
-        else if (strcmp(request, "WRITE_TO_SHM!") == 0) {
+        if (strncmp(request, "WRITE_TO_SHM!",14) == 0) {
             // Handle Write to Shared Memory Request
             unsigned int offset=0, value=0;
-            read(reqPipe,&offset,4);
-            read(reqPipe,&value,4);
-            unsigned int shmSize = 2638041;
+            read(reqPipe,&offset,sizeof(unsigned int));
+            read(reqPipe,&value,sizeof(unsigned int));
+            //unsigned int shmSize = 2638041;
                     if (offset >= 0 && offset<shmSize && offset + sizeof(unsigned int) <= shmSize) {
-                            //unsigned int* shmData = (unsigned int*)((char*)shmPtr + offset);
-                            //*shmData = value;
+                    
 
                             memcpy(&shmPtr[offset],(void*)&value,4);
 
@@ -220,6 +226,78 @@ int main() {
                             write(respPipe, "!", 1);
                        }
             }
+
+            if (strncmp(request, "MAP_FILE!", 9) == 0) {
+        // Handle Map File Request
+        char fileName[251];
+        ssize_t bytesRead;
+        bytesRead = read(reqPipe, fileName, sizeof(fileName)) ;
+        fileName[bytesRead-1] = '\0';
+
+        int fd = open(fileName, O_RDONLY);
+        if (fd != -1) {
+            struct stat fileStat;
+            if (fstat(fd, &fileStat) != -1) {
+                fileSize = fileStat.st_size;
+                filePtr=(char*)mmap(NULL, fileSize, PROT_READ, MAP_PRIVATE, fd, 0);
+                if (filePtr != (void*)-1) {
+                    // Successfully mapped file in memory
+                    const char* successResponse = "SUCCESS";
+                    const char* response = "MAP_FILE";
+                    int length;
+                    length = strlen(response);
+                    write(respPipe, response, length);
+                    write(respPipe, "!", 1);
+
+                    length = strlen(successResponse);
+                    write(respPipe, successResponse, length);
+                    write(respPipe, "!", 1);
+                } else {
+                    // Failed to map file in memory
+                    const char* errorResponse = "ERROR";
+                    const char* response = "MAP_FILE";
+                    int length;
+                    length = strlen(response);
+                    write(respPipe, response, length);
+                    write(respPipe, "!", 1);
+
+                    length = strlen(errorResponse);
+                    write(respPipe, errorResponse, length);
+                    write(respPipe, "!", 1);
+                }
+            } else {
+                // Failed to get file information
+                const char* errorResponse = "ERROR";
+                const char* response = "MAP_FILE";
+                int length;
+                length = strlen(response);
+                write(respPipe, response, length);
+                write(respPipe, "!", 1);
+
+                length = strlen(errorResponse);
+                write(respPipe, errorResponse, length);
+                write(respPipe, "!", 1);
+            }
+
+            close(fd);
+        } else {
+            // Failed to open the file
+            const char* errorResponse = "ERROR";
+            const char* response = "MAP_FILE";
+            int length;
+            length = strlen(response);
+            write(respPipe, response, length);
+            write(respPipe, "!", 1);
+
+            length = strlen(errorResponse);
+            write(respPipe, errorResponse, length);
+            write(respPipe, "!", 1);
+        }
+    }else {
+        break;
+    }
+    }
+
             close(shmFd);
 
     // Close the request pipe

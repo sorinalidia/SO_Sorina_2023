@@ -37,14 +37,18 @@ Test score: 3 / 10
 [TESTER] received string 'START'
 [TESTER] sending string 'MAP_FILE'
 [TESTER] sending string 'test_root/JyNm4mwS7iJK.LcS'
+[TESTER] received string 'MAP_FILE'
+[TESTER] received string 'ERROR'
 [TESTER] sending string 'EXIT'
-Test score: 1 / 5
+Test score: 5 / 5
 [1;35mTesting map1...[0m
 [TESTER] received string 'START'
 [TESTER] sending string 'MAP_FILE'
 [TESTER] sending string 'test_root/54sM7LhVpQ.ruO'
+[TESTER] received string 'MAP_FILE'
+[TESTER] received string 'SUCCESS'
 [TESTER] sending string 'EXIT'
-Test score: 1 / 5
+Test score: 5 / 5
 [1;35mTesting read_offset...[0m
 [TESTER] received string 'START'
 [TESTER] sending string 'CREATE_SHM'
@@ -52,6 +56,8 @@ Test score: 1 / 5
 [TESTER] received string 'CREATE_SHM'
 [TESTER] received string 'SUCCESS'
 [TESTER] sending string 'MAP_FILE'
+[TESTER] sending string 'test_root/54sM7LhVpQ.ruO'
+[TESTER] sending string 'EXIT'
 Test score: 2 / 10
 [1;35mTesting read_section...[0m
 [TESTER] received string 'START'
@@ -74,5 +80,5 @@ Test score: 1 / 10
 [TESTER] sending string 'EXIT'
 Test score: 1 / 10
 
-Total score: 29 / 70
-Assignment grade: 41.43 / 100
+Total score: 37 / 70
+Assignment grade: 52.86 / 100
